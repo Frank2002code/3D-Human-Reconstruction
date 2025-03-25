@@ -1,0 +1,11 @@
+.DS_Store
+Icon?
+pytorch3d/*
+MV-Generation/*
+brush-app-aarch64-apple-darwin/*
+paper/*
+report/*
+data/*
+test/*
+model/*.ply
+result/*
