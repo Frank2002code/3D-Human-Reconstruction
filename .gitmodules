@@ -1,0 +1,3 @@
+[submodule "MV-Generation"]
+	path = MV-Generation
+	url = https://github.com/Frank2002code/MV-Generation.git
