@@ -8,6 +8,8 @@ from torchvision import transforms
 from transformers import AutoModelForImageSegmentation
 import os
 import open3d as o3d
+from plyfile import PlyData, PlyElement
+import numpy as np
 
 def path_to_image(
     dir_path: str,
@@ -65,6 +67,46 @@ def show_ply_file(
     else:
         print("This is not a valid point cloud or mesh file.")
     return
+
+def convert2rgb(input_ply_path: str) -> None:
+    if not os.path.exists(input_ply_path):
+        raise FileNotFoundError(f"File not found: {input_ply_path}")
+    plydata = PlyData.read(stream=input_ply_path)
+
+    # coordinates of the vertices
+    x = np.array(plydata['vertex']['x'])
+    y = np.array(plydata['vertex']['y'])
+    z = np.array(plydata['vertex']['z'])
+    
+    print(f"coordinates shape: {x.shape}, {y.shape}, {z.shape}")
+
+    # colors of the vertices
+    try:
+        r = np.clip(np.array(plydata['vertex']['f_dc_0']) * 255, 0, 255).astype(np.uint8)
+        g = np.clip(np.array(plydata['vertex']['f_dc_1']) * 255, 0, 255).astype(np.uint8)
+        b = np.clip(np.array(plydata['vertex']['f_dc_2']) * 255, 0, 255).astype(np.uint8)
+    except KeyError as e:
+        raise RuntimeError("The input PLY file does not contain RGB color information.") from e
+
+    # Create a new PLY file with the same vertices but with color information
+    vertex_data = np.array(
+        list(zip(x, y, z, r, g, b)),
+        dtype=[
+            ('x', 'f4'),
+            ('y', 'f4'),
+            ('z', 'f4'),
+            ('red', 'u1'),
+            ('green', 'u1'),
+            ('blue', 'u1'),
+        ]
+    )
+
+    # === 建立新 PLY 結構並儲存為 ASCII（方便 Blender 載入）===
+    output_ply_path = "model/tsai_video_nobg_colored.ply"
+    vertex_element = PlyElement.describe(vertex_data, 'vertex')
+    PlyData([vertex_element], text=True).write(output_ply_path)
+
+    print(f"✅New PLY file saved to {output_ply_path}")
 
 if __name__ == "__main__":
     import sys
