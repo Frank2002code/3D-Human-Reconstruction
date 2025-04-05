@@ -85,19 +85,28 @@ def convert2rgb(input_ply_path: str) -> None:
         r = np.clip(np.array(plydata['vertex']['f_dc_0']) * 255, 0, 255).astype(np.uint8)
         g = np.clip(np.array(plydata['vertex']['f_dc_1']) * 255, 0, 255).astype(np.uint8)
         b = np.clip(np.array(plydata['vertex']['f_dc_2']) * 255, 0, 255).astype(np.uint8)
+        
+        # 其他屬性：scale, opacity, rotation
+        scale_0 = plydata['vertex']['scale_0']
+        scale_1 = plydata['vertex']['scale_1']
+        scale_2 = plydata['vertex']['scale_2']
+        opacity  = plydata['vertex']['opacity']
+        rot_0 = plydata['vertex']['rot_0']
+        rot_1 = plydata['vertex']['rot_1']
+        rot_2 = plydata['vertex']['rot_2']
+        rot_3 = plydata['vertex']['rot_3']
     except KeyError as e:
-        raise RuntimeError("The input PLY file does not contain RGB color information.") from e
+        raise RuntimeError("The input PLY file does not contain RGB color and other information.") from e
 
     # Create a new PLY file with the same vertices but with color information
     vertex_data = np.array(
-        list(zip(x, y, z, r, g, b)),
+        list(zip(x, y, z, r, g, b, scale_0, scale_1, scale_2, opacity, rot_0, rot_1, rot_2, rot_3)),
         dtype=[
-            ('x', 'f4'),
-            ('y', 'f4'),
-            ('z', 'f4'),
-            ('red', 'u1'),
-            ('green', 'u1'),
-            ('blue', 'u1'),
+            ('x', 'f4'), ('y', 'f4'), ('z', 'f4'),
+            ('red', 'u1'), ('green', 'u1'), ('blue', 'u1'),
+            ('scale_0', 'f4'), ('scale_1', 'f4'), ('scale_2', 'f4'),
+            ('opacity', 'f4'),
+            ('rot_0', 'f4'), ('rot_1', 'f4'), ('rot_2', 'f4'), ('rot_3', 'f4'),
         ]
     )
 
@@ -110,8 +119,9 @@ def convert2rgb(input_ply_path: str) -> None:
 
 if __name__ == "__main__":
     import sys
-    model_path = "model/tsai_video_nobg_model.ply"
-    show_ply_file(model_path)
+    model_path = "model/tsai_video_nobg.ply"
+    # show_ply_file(model_path)
+    convert2rgb(model_path)
     input("Input any key to exit.")
     sys.exit(0)
     # Prepare transform & model

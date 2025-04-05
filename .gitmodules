@@ -1,3 +1,6 @@
 [submodule "MV-Generation"]
 	path = MV-Generation
 	url = https://github.com/Frank2002code/MV-Generation.git
+[submodule "Get3DHuman"]
+	path = Get3DHuman
+	url = https://github.com/GAP-LAB-CUHK-SZ/Get3DHuman.git
