@@ -1,11 +1,16 @@
+# Mac files
 .DS_Store
 Icon?
+
+# Python Library
 pytorch3d/*
-MV-Generation/*
+
+# Submodules
 brush-app-aarch64-apple-darwin/*
+
+# Other
 paper/*
 report/*
 data/*
 test/*
-model/*.ply
-result/*
+result/3Dmodel/*

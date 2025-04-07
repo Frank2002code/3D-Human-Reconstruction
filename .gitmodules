@@ -4,3 +4,6 @@
 [submodule "Get3DHuman"]
 	path = Get3DHuman
 	url = https://github.com/GAP-LAB-CUHK-SZ/Get3DHuman.git
+[submodule "BiRefNet"]
+	path = BiRefNet
+	url = https://github.com/ZhengPeng7/BiRefNet.git
