@@ -17,11 +17,12 @@ echo "📦Extracting brush..."
 tar -xf "$FILE"  # -f: Specify the file to extract
 
 # Locate the executable
+cd brush-app-x86_64-unknown-linux-gnu/
 EXEC="./brush_app"
 
 # Grant execute permissions
 chmod +x "$EXEC"
 
 # Run the application
-echo "🚀Run the application“
-exec "$EXEC"
+echo "🚀Run the application"
+./"$EXEC"

@@ -5,8 +5,10 @@ Icon?
 # Python Library
 pytorch3d/*
 
-# Submodules
+# Brush app
 brush-app-aarch64-apple-darwin/*
+3DGS/*.xz
+3DGS/brush-app-x86_64-unknown-linux-gnu/*
 
 # Other
 paper/*
