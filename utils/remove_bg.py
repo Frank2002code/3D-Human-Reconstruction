@@ -1,11 +1,12 @@
 import warnings
 warnings.filterwarnings("ignore")
 
+import os
 from PIL import Image
 import torch as T
 from torchvision import transforms
 from transformers import AutoModelForImageSegmentation
-import os
+from tqdm import tqdm
 
 def path_to_image(
     images_folder_path: str,
@@ -19,8 +20,12 @@ def path_to_image(
     for filename in os.listdir(images_folder_path):
         if filename.lower().endswith(image_exten):
             image_path = os.path.join(images_folder_path, filename)
-            image = Image.open(fp=image_path)
-            images.append(image)
+            try:
+                image = Image.open(fp=image_path)
+                images.append(image)
+            except Exception as e:
+                print(f"Cannot open {image_path}: {e}")
+                continue
     return images
 
 def remove_images_bg(
@@ -51,7 +56,7 @@ def remove_images_bg(
     if net is None:
         net = AutoModelForImageSegmentation.from_pretrained(
             "ZhengPeng7/BiRefNet", trust_remote_code=True
-        ).to(device).eval()  # half precision
+        ).to(device).eval().half()  # half precision
     if transform is None:
         transform = transforms.Compose(
             [
@@ -66,7 +71,7 @@ def remove_images_bg(
     def remove_image_bg(
         image: Image.Image,
     ) -> Image.Image:
-        input_images = transform(image).unsqueeze(0).to(device)  # add a batch dimension and half precision
+        input_images = transform(image).unsqueeze(0).to(device).half()  # add a batch dimension and half precision
         with T.no_grad():
             preds = net(input_images)[-1].sigmoid().cpu()
         pred = preds[0].squeeze()
@@ -87,7 +92,7 @@ def remove_images_bg(
     #         output_path = os.path.join(output_folder_path, f"viewpoint_{idx:04d}.png")
     #         image.save(fp=output_path)
     #         print(f"Image {idx + 1} saved to {output_path}")
-    for idx, image in enumerate(images):
+    for idx, image in enumerate(tqdm(images)):
         if idx == 0:
             print(f"Start removing background from {len(images)} images.")
         image = remove_image_bg(
@@ -95,6 +100,8 @@ def remove_images_bg(
         )
         output_path = os.path.join(output_folder_path, f"viewpoint_{idx:04d}.png")
         image.save(fp=output_path)
+        del image
+        T.cuda.empty_cache() if device.type == "cuda" else None  # clear GPU memory
         print(f"Image {idx + 1} saved to {output_path}")
 
 if __name__ == "__main__":
