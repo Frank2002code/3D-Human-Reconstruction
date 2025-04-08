@@ -113,7 +113,7 @@ if __name__ == "__main__":
     #         images
     #     )
     # )
-    images_folder_path = f"../data/creeper"
+    images_folder_path = f"../creeper"
     output_folder_path = f"../result/creeper_nobg"
     
     remove_images_bg(
