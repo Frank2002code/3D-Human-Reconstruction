@@ -15,6 +15,7 @@ from mvadapter.utils import (
     get_plucker_embeds_from_cameras_ortho,
     make_image_grid,
 )
+import os
 
 
 def prepare_pipeline(
@@ -134,6 +135,8 @@ def run_pipeline(
     # Prepare cameras
     if num_views == 2:
         azimuth_deg = [0, 180]  # 方位角
+    elif num_views == 6:
+        azimuth_deg = [0, 60, 120, 180, 240, 300]
     elif num_views == 8:
         azimuth_deg = [0, 45, 90, 135, 180, 225, 270, 315]
     else:
@@ -218,7 +221,7 @@ if __name__ == "__main__":
         type=str,
         default="watermark, ugly, deformed, noisy, blurry, low contrast",
     )
-    parser.add_argument("--output", type=str, default="output.png")
+    parser.add_argument("--output_path", type=str, default="output.png")
     # Extra
     parser.add_argument("--remove_bg", action="store_true", help="Remove background")
     args = parser.parse_args()
@@ -253,7 +256,7 @@ if __name__ == "__main__":
     else:
         remove_bg_fn = None
 
-    images, reference_image = run_pipeline(
+    images, _ = run_pipeline(
         pipe,
         num_views=args.num_views,
         text=args.text,
@@ -270,5 +273,9 @@ if __name__ == "__main__":
         remove_bg_fn=remove_bg_fn,
         azimuth_deg=args.azimuth_deg,
     )
-    make_image_grid(images, rows=1).save(args.output)
-    reference_image.save(args.output.rsplit(".", 1)[0] + "_reference.png")
+    # make_image_grid(images, rows=1).save(args.output)
+    # reference_image.save(args.output.rsplit(".", 1)[0] + "_reference.png")
+    os.makedirs(os.path.dirname(args.output_path), exist_ok=True)
+    # filename = os.path.basename(args.output_path)
+    for idx, img in enumerate(tqdm(images)):
+        img.save(f"{args.output_path}_{idx}.png")
